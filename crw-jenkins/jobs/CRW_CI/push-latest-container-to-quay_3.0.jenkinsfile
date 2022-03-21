@@ -10,11 +10,18 @@ import groovy.transform.Field
 
 def checkFailure(arrayLines,serverName,errorOccurred)
 {
+    int numGoodLines=0
     arrayLines.each  { 
         line -> if (line?.toString().indexOf("No tags matching")>-1 || line?.toString().indexOf("ERROR")>-1) { 
             errorOccurred = errorOccurred + line + '\n'; 
             currentBuild.result = 'FAILURE'
+        } else if (line?.toString().length()>=20) {
+            numGoodLines++
         }
+    }
+    if (numGoodLines<1) {
+        errorOccurred = errorOccurred + "[file is empty!]" + '\n'; 
+        currentBuild.result = 'FAILURE'
     }
     return errorOccurred
 }
@@ -75,6 +82,12 @@ wait
                         script: "./getLatestImageTags.sh -b ${MIDSTM_BRANCH} --quay --tag ${CRW_VERSION}- --hide | tee ${WORKSPACE}/LATEST_IMAGES.quay",
                         returnStdout: true).trim().split( '\n' )
                         errorOccurred = checkFailure(NEW_QUAY, "Quay", errorOccurred)
+
+                    def LATEST_IMAGES_QUAY = sh (script: 'cat ${WORKSPACE}/LATEST_IMAGES.quay || true', returnStdout: true).trim()
+                    if (!LATEST_IMAGES_QUAY?.trim()) { // file is empty so throw an error
+                        currentBuild.description+="; Could not load images from Quay!"
+                        currentBuild.result = 'ABORTED'
+                    }
 
                     sh (
                         script: 'curl -sSLO https://raw.githubusercontent.com/redhat-developer/devspaces/'+MIDSTM_BRANCH+'/product/getTagForImage.sh && chmod +x getTagForImage.sh',

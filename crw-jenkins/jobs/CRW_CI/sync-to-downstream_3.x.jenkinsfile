@@ -256,8 +256,9 @@ rm -f /tmp/rsync-excludes
                   }
                   println ("Trigger get-sources-rhpkg-container-build_" + JOB_BRANCH + " for ${QUAY_REPO_PATH} from containers/${SYNC_REPOS[i]} branch ${MIDSTM_BRANCH}, job branch ${JOB_BRANCH} ...")
                   // kick off get-sources-rhpkg-container-build_2.y job
-                  build(
-                    job: 'get-sources-rhpkg-container-build_' + JOB_BRANCH,
+	          jobPath='/job/CRW_CI/job/get-sources-rhpkg-container-build_' + JOB_BRANCH
+	          final jobResult = build(
+                    job: jobPath.replaceAll("/job/","/"),
                     wait: true,
                     propagate: true,
                     quietPeriod: 0,
@@ -324,7 +325,10 @@ rm -f /tmp/rsync-excludes
                       ]
                     ]
                   )
-                  currentBuild.description+=" brew triggered; "
+                  jobLink=jobPath + "/" +  jobResult?.number?.toString()
+                  println("waiting for build(" + jobPath + ")")
+                  println("++> Job ${JENKINS_URL}${jobLink}/console completed.")
+                  currentBuild.description+="; <a href=${jobLink}/console>" + (jobLink.replaceAll("/job/","/")) + "</a> triggered" 
                 } else {
                   println "No changes upstream, nothing to commit for ${SYNC_REPOS[i]}"
                   currentBuild.description+=" no changes; "
