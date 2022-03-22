@@ -364,8 +364,9 @@ node(nodeLabelAnyArch){
       echo "currentBuild.result = " + currentBuild.result
       if (!currentBuild.result.equals("ABORTED") && !currentBuild.result.equals("FAILURE")) {
         if (!NEW_SHA.equals(OLD_SHA) || FORCE_BUILD.equals("true")) {
-          build(
-                job: 'dsc_' + JOB_BRANCH,
+          jobPath='/job/CRW_CI/job/dsc_' + JOB_BRANCH
+          final jobResult = build(
+                job: jobPath.replaceAll("/job/","/"),
                 wait: false,
                 propagate: false,
                 quietPeriod: 0,
@@ -396,7 +397,9 @@ node(nodeLabelAnyArch){
                   ]
                 ]
           )
-          currentBuild.description+=" dsc build triggered"
+          println("triggered build(" + jobPath + ") [no wait]")
+          println("=?> Job ${JENKINS_URL}${jobPath} triggered.")
+          currentBuild.description+="; <a href=${jobPath}/>" + jobPath + "</a> triggered" 
         } else {
           println "No changes upstream, nothing to rebuild in dsc!"
           currentBuild.description+=" no dsc build"

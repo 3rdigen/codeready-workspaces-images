@@ -152,7 +152,7 @@ cd devspaces-theia && var=THEIA_COMMIT_SHA; sed -n "/${var}=/ s/${var}=//p" BUIL
                 ansiColor('xterm') {
                   echo "[INFO] Build images: " + CONTAINERS
                   buildStatusCode = sh script:'''#!/bin/bash -e
-. ~/crw_env ''' + CRW_VERSION + '''
+. ~/crw_env ''' + CRW_VERSION + ''' || { echo "[ERROR] Problem running on ''' + nodeLabel + ''': . ~/crw_env ''' + CRW_VERSION + '''"; exit 1; }
 echo "Node: $(node --version) ( $(which node) )"
 echo "Yarn: $(yarn --version) ( $(which yarn) )"
 
