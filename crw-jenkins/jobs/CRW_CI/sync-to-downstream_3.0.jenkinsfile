@@ -328,7 +328,7 @@ rm -f /tmp/rsync-excludes
                   jobLink=jobPath + "/" +  jobResult?.number?.toString()
                   println("waiting for build(" + jobPath + ")")
                   println("++> Job ${JENKINS_URL}${jobLink}/console completed.")
-                  currentBuild.description+="; <a href=${jobLink}/console>" + (jobLink.replaceAll("/job/","/")) + "</a> triggered" 
+                  currentBuild.description+="; <a href=${jobLink}/>" + (jobLink.replaceAll("/job/","/")) + "</a> triggered" 
                 } else {
                   println "No changes upstream, nothing to commit for ${SYNC_REPOS[i]}"
                   currentBuild.description+=" no changes; "

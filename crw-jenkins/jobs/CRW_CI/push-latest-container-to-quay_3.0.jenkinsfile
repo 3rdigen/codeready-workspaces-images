@@ -176,8 +176,9 @@ node(nodeLabel){
         } else if (!DIFF_LATEST_IMAGES_QUAY_V_STORED.equals("")) {
             println "Scheduling update-digests-in-metadata for this update:"
             println DIFF_LATEST_IMAGES_QUAY_V_STORED
-            build(
-                job: 'update-digests-in-metadata_' + JOB_BRANCH,
+            jobPath='/job/CRW_CI/job/update-digests-in-metadata_' + JOB_BRANCH
+            final jobResult = build(
+                job: jobPath.replaceAll("/job/","/"),
                 wait: false,
                 propagate: false,
                 quietPeriod: 0,
@@ -199,7 +200,10 @@ node(nodeLabel){
                     ]
                 ]
             )
-            currentBuild.description+="; update-digests-in-metadata triggered"
+            jobLink=jobPath + "/" +  jobResult?.number?.toString()
+            println("waiting for build(" + jobPath + ")")
+            println("++> Job ${JENKINS_URL}${jobLink}/console completed.")
+            currentBuild.description+="; <a href=${jobLink}/>" + (jobLink.replaceAll("/job/","/")) + "</a> triggered" 
         } else {
             println "No changes to LATEST_IMAGES; no need to trigger update-digests-in-metadata_" + CRW_VERSION
             currentBuild.result = 'UNSTABLE'

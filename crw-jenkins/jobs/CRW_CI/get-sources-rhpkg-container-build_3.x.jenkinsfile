@@ -26,7 +26,7 @@ timeout(240) {
           sh('curl -sSLO https://raw.githubusercontent.com/redhat-developer/devspaces/'+ MIDSTM_BRANCH + '/product/util2.groovy')
           def util = load "${WORKSPACE}/util2.groovy"
           JOB_BRANCH = util.getJobBranch(MIDSTM_BRANCH)
-          CRW_VERSION = util.getCrwVersion(MIDSTM_BRANCH)            
+          CRW_VERSION = util.getCrwVersion(MIDSTM_BRANCH)
           cleanWs()
           util.cloneRepo("ssh://crw-build@pkgs.devel.redhat.com/${GIT_PATHs}", "${WORKSPACE}/sources", MIDSTM_BRANCH, false)
           currentBuild.description=QUAY_REPO_PATHs.replaceAll("devspaces-3-rhel8-","").replaceAll("-rhel8","").trim() + " : ${JOB_BRANCH}"
@@ -159,7 +159,7 @@ wait
           jobLink=jobPath + "/" +  jobResult?.number?.toString()
           println("waiting for runJob(" + jobPath + ")")
           println("++> Job ${JENKINS_URL}${jobLink}/console completed.")
-          currentBuild.description+="; <a href=${jobLink}/console>" + (jobLink.replaceAll("/job/","/")) + "</a> triggered" 
+          currentBuild.description+="; <a href=${jobLink}/>" + (jobLink.replaceAll("/job/","/")) + "</a> triggered" 
         }
       } catch (e) {
         currentBuild.result = "UNSTABLE"
